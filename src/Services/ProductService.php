@@ -22,7 +22,6 @@ class ProductService
     {
         function showTree($treeJson, $listJson) {
             $data = [];
-            $output = null;
             if (is_array($treeJson) && count($treeJson) > 0) {
                 foreach ($treeJson as $key => $treeValue) {
                     if (is_array($treeValue)) {
@@ -31,8 +30,8 @@ class ProductService
                         $listKey = array_search($treeValue, array_column($listJson, 'category_id'));
                         $categoryId = (int) $listJson[$listKey]['category_id'];
                         if ($treeValue == $categoryId) {
-                            $data['id'] = $treeJson['id'] = $treeValue;
-                            $data['name'] = $treeJson['name'] = $listJson[$listKey]['translations']['pl_PL']['name'];
+                            $data['id'] = $treeValue;
+                            $data['name'] = $listJson[$listKey]['translations']['pl_PL']['name'];
                         }
                     }
                 }
