@@ -18,27 +18,30 @@ class ProductService
         return ['list' => $listJson, 'tree' => $treeJson];
     }
 
-    public function prepareJson(array $listJson, array $treeJson) : array
+    public function prepareJson(array $treeJson, array $listJson)
     {
-        foreach ($treeJson as $keyT => $tree) {
-            foreach ($listJson as $list) {
-                if ($tree['id'] == $list['category_id']) {
-                    unset($treeJson[$keyT]['children']);
-                    $treeJson[$keyT]['name'] = $list['translations']['pl_PL']['name'];
-                    $treeJson[$keyT]['children'] = $tree['children'];
-                }
-                foreach ($tree['children'] as $keyC => $treeChildren) {
-                    if ($treeChildren['id'] == $list['category_id']) {
-                        unset($treeJson[$keyT]['children'][$keyC]['children']);
-                        $treeChildren['name'] = $list['translations']['pl_PL']['name'];
-                        $treeJson[$keyT]['children'][$keyC]['name'] = $treeChildren['name'];
-                        $treeJson[$keyT]['children'][$keyC]['children'] = [];
+        function showTree($treeJson, $listJson) {
+            $data = [];
+            $output = null;
+            if (is_array($treeJson) && count($treeJson) > 0) {
+                foreach ($treeJson as $key => $treeValue) {
+                    if (is_array($treeValue)) {
+                        $data['children'][] = showTree($treeValue, $listJson);
+                    } else {
+                        $listKey = array_search($treeValue, array_column($listJson, 'category_id'));
+                        $categoryId = (int) $listJson[$listKey]['category_id'];
+                        if ($treeValue == $categoryId) {
+                            $data['id'] = $treeJson['id'] = $treeValue;
+                            $data['name'] = $treeJson['name'] = $listJson[$listKey]['translations']['pl_PL']['name'];
+                        }
                     }
                 }
             }
+            return $data;
         }
-        return $treeJson;
+        return showTree($treeJson, $listJson);
     }
+
 
     public function writeJson(array $treeFile, string $writeDirectory)
     {

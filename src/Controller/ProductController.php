@@ -23,7 +23,7 @@ class ProductController extends AbstractController
     public function write(): Response
     {
         $files = $this->productService->readJson($this->getParameter('json_files_location'));
-        $modifyFile = $this->productService->prepareJson($files['list'], $files['tree']);
+        $modifyFile = $this->productService->prepareJson($files['tree'], $files['list']);
         $this->productService->writeJson($modifyFile, $this->getParameter('json_file_output_location'));
         return new Response('file has been modify');
     }
